@@ -1,0 +1,19 @@
+{
+  "name": "todo",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "start": "node ./app",
+    "devstart": "nodemon ./app"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "debug": "~2.6.9",
+    "express": "~4.16.2"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^1.12.1"
+  }
+}

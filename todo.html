@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"> 
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <title>toDoo</title>
+</head>
+<body>
+
+
+<!-- javaScript -->
+  <script>
+  //Register the service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').then(function(registration) {
+      // Registration was successful
+      console.log('ServiceWorker registration successful with scope: ',
+      registration.scope);
+      })
+      .catch(function(err) {
+          // registration failed
+          console.log('ServiceWorker registration failed: ', err);
+      });
+    } 
+  </script> 
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href="#">toDoo</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+      </ul>
+      <div class="btn-group">
+        <button type="button" class="btn btn-primary navbar-btn" id="listOpen">open</button>
+        <button type="button" class="btn btn-primary navbar-btn" id="listClosed">closed</button>
+        <button type="button" class="btn btn-primary navbar-btn" id="listAll">all</button>
+        </div>
+    </div>
+  </div>
+</nav>
+
+
+
+<div class="container">
+	<h1>ToDo List</h1>
+	<p>Eine einfache Pendenzentracking App</p>
+
+	<form action="/create" method="POST" name="myForm" id="form">
+        <div class="form-group">
+            <label for="name">Enter task:</label>
+            <input type="text" class="form-control" id="usr" name="pendenz" value="Pendenz">
+        </div>
+        <button type="submit" id="submit" class="btn btn-default">Add</button>
+	</form>
+
+	<div class="container-fluid">
+        <ul id="list" class="list-unstyled">
+    		<!-- hier kommen die Tasks hin -->
+    	</ul>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        //$( window ).on("load", listItems);
+        //$("#list").ready(listItems);
+        //$(listItems);
+
+        // wenn Checkbox geändert wird
+        function checkboxChanged() {
+            if ($(this)[0].hasAttribute('checked') == true) {
+            //if ($(this).prop('status') == 'checked') {
+                var formData = {
+                'id'      : $(this).attr('id'),
+                'status' : 'unchecked' 
+                }
+            } else {
+                var formData = {
+                'id'      : $(this).attr('id'),
+                'status'  : 'checked'
+                }
+            }; 
+            $.ajax({
+                type: 'POST',
+                url:  'updateItem',
+                data: formData  
+            })
+            .done(listItems)
+        }
+
+        // Liste erstellen
+        function listItems(data, callback){
+            var json = JSON.parse(data);
+                $('#list li').remove();         // Liste löschen
+                json.forEach(function(item){    // Liste neu aufbauen
+                    if ($(item).prop('status') == 'checked') {
+                        $("#list").append('<li><div class="checkbox"><input type="checkbox" id='+item.taskid+' checked><label>'+item.task+'</label></li></div>');
+                    }
+                    else {
+                        $("#list").append('<li><div class="checkbox"><input type="checkbox" id='+item.taskid+'><label>'+item.task+'</label></li></div>');    
+                    }
+                });
+                $("input:checkbox").on('click', checkboxChanged); // EventHandler
+        }
+
+  
+        // Neuer Task an Server senden und Liste aktualisieren d.h. neu aufbauen
+        $("#form").submit(function(event){
+        	var formData = {'pendenz' : $('input[name=pendenz]').val()};
+        	$.ajax({
+                type: 'POST',
+                url:  'create',
+                data: formData
+            })
+            .done(listItems)
+        	event.preventDefault();
+        });
+        
+        // Filter: alle Task anzeigen ( = Filter löschen)
+        $("#listAll").click(function(){
+            $.ajax({
+                type: 'GET',
+                url: 'listTasks'  
+            })
+            .done(listItems)
+    	});
+
+        // Filter: nur geschlossene Tasks anzeigen
+        $("#listClosed").click(function(){
+            $.ajax({
+                type: 'GET',
+                url: 'listClosedTasks'
+            })
+            .done(listItems)   
+    	});
+
+        // Filter: nur offene Tasks anzeigen
+    	$("#listOpen").click(function(){
+            $.ajax({
+                type: 'GET',
+                url: 'listOpenTasks',
+            })
+            .done(listItems)   
+        });
+	});
+</script>
+
+
+
+
+</body>
+</html>
+
+
