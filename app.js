@@ -16,7 +16,7 @@ var id = 1;
 
 // Router und Controller
 app.get('/', function (req, res) {
-	res.sendFile(path.join(__dirname + '/todo.html'));
+	res.sendFile(path.join(__dirname + '/index.html'));
 });
 
 app.post('/updateItem', function(req,res) {
@@ -65,5 +65,5 @@ app.get('/listOpenTasks', function(req, res) {
 });
 
 app.listen(process.env.PORT || 3000, function() {
-  console.log('App listening on port 3000!');
+  console.log('App listening on port 3000 oder so!');
 });
