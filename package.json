@@ -12,6 +12,9 @@
     "debug": "~2.6.9",
     "express": "~4.16.2"
   },
+    "engines": {
+    "node": "8.7.0."
+  },
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -22,4 +25,3 @@
     "start": "node app.js"
   }
 }
-
