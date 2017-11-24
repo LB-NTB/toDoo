@@ -34,7 +34,7 @@ this.addEventListener('fetch', event => {
       fetch(event.request.url).catch(error => { 
         return caches.match(offlineUrl); 
       } 
-    ); 
+    )); 
   } 
   else { 
     event.respondWith(fetch(event.request)); }
