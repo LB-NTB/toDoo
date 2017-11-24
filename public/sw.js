@@ -35,7 +35,7 @@ this.addEventListener('fetch', event => {
           return caches.match(offlineUrl); 
         }) 
       )
-    }; 
+    } 
   else { 
     event.respondWith(fetch(event.request)); }
 };
