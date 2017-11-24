@@ -47,7 +47,7 @@ self.addEventListener('activate', function(event) {
 */
 
 // Cache any new resources as they are fetched
-self.addEventListener('fetch', event => { 
+/*self.addEventListener('fetch', event => { 
   event.respondWith(
     caches.match(event.request, { ignoreSearch: true }) 
     .then(function(response) { 
@@ -75,7 +75,7 @@ self.addEventListener('fetch', event => {
 
     }) 
   ); 
-});
+});*/
 
  
 // Network Request Interception
