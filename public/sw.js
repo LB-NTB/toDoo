@@ -38,7 +38,7 @@ this.addEventListener('fetch', event => {
     }; 
   else { 
     event.respondWith(fetch(event.request)); }
-}
+};
 
 
 /* Beispie aus Buch:
