@@ -4,6 +4,7 @@ var cacheName = 'toDoo';
 
 // Cache our known resources during install 
 self.addEventListener('install', event => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(cacheName)
     .then(cache => cache.addAll([
@@ -13,6 +14,16 @@ self.addEventListener('install', event => {
   ); 
 });
 
+// SW aktiviert sich selbst, ohne Reload
+self.addEventListener('activate', event => {
+  clients.claim(); 
+});
+
+
+/* Beispie aus Buch:
+self.addEventListener('activate', function(event) { 
+  event.waitUntil(self.clients.claim()); });
+*/
 
 // Cache any new resources as they are fetched
 self.addEventListener('fetch', event => { 
@@ -45,3 +56,14 @@ self.addEventListener('fetch', event => {
   ); 
 });
 
+ 
+// Network Request Interception
+self.addEventListener('fetch', function(event) { 
+  if (/\.jpg$/.test(event.request.url)) { 
+    event.respondWith( 
+      new Response('<p>This is a response that comes from your service worker!</p>', { 
+        headers: { 'Content-Type': 'text/html' } 
+      });
+    ); 
+  }
+});
