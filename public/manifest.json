@@ -26,3 +26,11 @@
 ]
 
 }
+
+/*
+Voraussetzungen für Splash-Screen
+• Web App Manifest mit
+• name
+• background_color
+• 192x192 png icon
+*/

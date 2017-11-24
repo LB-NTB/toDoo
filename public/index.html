@@ -51,7 +51,6 @@
 </nav>
 
 
-
 <div class="container">
 	<h1>ToDo List</h1>
 	<p>Eine einfache Pendenzentracking App</p>
@@ -73,14 +72,10 @@
 
 <script type="text/javascript">
     $(document).ready(function(){
-        //$( window ).on("load", listItems);
-        //$("#list").ready(listItems);
-        //$(listItems);
 
         // wenn Checkbox geändert wird
         function checkboxChanged() {
             if ($(this)[0].hasAttribute('checked') == true) {
-            //if ($(this).prop('status') == 'checked') {
                 var formData = {
                 'id'      : $(this).attr('id'),
                 'status' : 'unchecked' 
@@ -114,7 +109,6 @@
                 $("input:checkbox").on('click', checkboxChanged); // EventHandler
         }
 
-  
         // Neuer Task an Server senden und Liste aktualisieren d.h. neu aufbauen
         $("#form").submit(function(event){
         	var formData = {'pendenz' : $('input[name=pendenz]').val()};
@@ -155,9 +149,6 @@
         });
 	});
 </script>
-
-
-
 
 </body>
 </html>

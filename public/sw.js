@@ -1,6 +1,8 @@
-"use strict";
+'use strict';
 
 var cacheName = 'toDoo';
+//const cacheName = ‘offline-cache’;
+const offlineUrl = 'offline-page.html';
 
 // Cache our known resources during install 
 self.addEventListener('install', event => {
@@ -9,15 +11,34 @@ self.addEventListener('install', event => {
     caches.open(cacheName)
     .then(cache => cache.addAll([
         //'index.html', 
-        'sw.js' 
+        'sw.js',
+        offlineUrl
     ])) 
   ); 
 });
+
+
+
 
 // SW aktiviert sich selbst, ohne Reload
 self.addEventListener('activate', event => {
   clients.claim(); 
 });
+
+
+// Offline-Seite wird aus dem Cache geladen
+this.addEventListener('fetch', event => {
+  if(event.request.method ==='GET' && 
+    event.request.headers.get('accept').includes('text/html')){ 
+    event.respondWith( 
+      fetch(event.request.url).catch(error => { 
+        return caches.match(offlineUrl); 
+      } 
+    ); 
+  } 
+  else { 
+    event.respondWith(fetch(event.request)); }
+}
 
 
 /* Beispie aus Buch:
