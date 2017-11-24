@@ -30,12 +30,12 @@ self.addEventListener('activate', event => {
 this.addEventListener('fetch', event => {
   if(event.request.method ==='GET' && 
     event.request.headers.get('accept').includes('text/html')){ 
-    event.respondWith( 
-      fetch(event.request.url).catch(error => { 
-        return caches.match(offlineUrl); 
-      } 
-    )); 
-  } 
+      event.respondWith( 
+        fetch(event.request.url).catch(error => { 
+          return caches.match(offlineUrl); 
+        }) 
+      )
+    }; 
   else { 
     event.respondWith(fetch(event.request)); }
 }
