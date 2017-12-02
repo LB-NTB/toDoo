@@ -4,30 +4,31 @@
     <meta charset="utf-8"> 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+     <link rel="stylesheet" type="text/css" href="./css/toDoo.css">
+
+    <!-- Google fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+
+    <!-- Manifest -->
     <link rel="manifest" href="/manifest.json">
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- DB for Background Sync -->
+    <script src="./js/idb-keyval.js" ></script>
+
     <title>toDoo</title>
+
+    <style>
+
+    </style>
+
+
 </head>
 <body>
 
-
-<!-- javaScript -->
-  <script>
-  //Register the service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js').then(function(registration) {
-      // Registration was successful
-      console.log('ServiceWorker registration successful with scope: ',
-      registration.scope);
-      })
-      .catch(function(err) {
-          // registration failed
-          console.log('ServiceWorker registration failed: ', err);
-      });
-    } 
-  </script> 
-
+<!-- Nav-bar -->
 <nav class="navbar navbar-inverse">
   <div class="container-fluid">
     <div class="navbar-header">
@@ -50,15 +51,17 @@
   </div>
 </nav>
 
-
+<!-- Main -->
 <div class="container">
+	<div id="offline"></div>
+	<div id="message"></div>
 	<h1>ToDo List</h1>
-	<p>Eine einfache Pendenzentracking App</p>
+	<p>Eine einfache Pendenzen-Tracking-App</p>
 
 	<form action="/create" method="POST" name="myForm" id="form">
         <div class="form-group">
             <label for="name">Enter task:</label>
-            <input type="text" class="form-control" id="usr" name="pendenz" value="Pendenz">
+            <input type="text" class="form-control" id="pendenz" name="pendenz" value="Pendenz ">
         </div>
         <button type="submit" id="submit" class="btn btn-default">Add</button>
 	</form>
@@ -70,85 +73,77 @@
     </div>
 </div>
 
-<script type="text/javascript">
-    $(document).ready(function(){
+<!-- Javascript -->
+<script async src="./js/main.js"></script>
 
-        // wenn Checkbox geändert wird
-        function checkboxChanged() {
-            if ($(this)[0].hasAttribute('checked') == true) {
-                var formData = {
-                'id'      : $(this).attr('id'),
-                'status' : 'unchecked' 
-                }
-            } else {
-                var formData = {
-                'id'      : $(this).attr('id'),
-                'status'  : 'checked'
-                }
-            }; 
-            $.ajax({
-                type: 'POST',
-                url:  'updateItem',
-                data: formData  
-            })
-            .done(listItems)
-        }
+<!-- Service Worker -->
+<script>
 
-        // Liste erstellen
-        function listItems(data, callback){
-            var json = JSON.parse(data);
-                $('#list li').remove();         // Liste löschen
-                json.forEach(function(item){    // Liste neu aufbauen
-                    if ($(item).prop('status') == 'checked') {
-                        $("#list").append('<li><div class="checkbox"><input type="checkbox" id='+item.taskid+' checked><label>'+item.task+'</label></li></div>');
-                    }
-                    else {
-                        $("#list").append('<li><div class="checkbox"><input type="checkbox" id='+item.taskid+'><label>'+item.task+'</label></li></div>');    
-                    }
-                });
-                $("input:checkbox").on('click', checkboxChanged); // EventHandler
-        }
 
-        // Neuer Task an Server senden und Liste aktualisieren d.h. neu aufbauen
-        $("#form").submit(function(event){
-        	var formData = {'pendenz' : $('input[name=pendenz]').val()};
-        	$.ajax({
-                type: 'POST',
-                url:  'create',
-                data: formData
-            })
-            .done(listItems)
-        	event.preventDefault();
-        });
-        
-        // Filter: alle Task anzeigen ( = Filter löschen)
-        $("#listAll").click(function(){
-            $.ajax({
-                type: 'GET',
-                url: 'listTasks'  
-            })
-            .done(listItems)
-    	});
+// #####################################################################
+// #                                                                   #
+// #  Register Service Worker                                          #
+// #                                                                   #
+// #####################################################################
+  	
+  	//Register the service worker without Background Sync
+/*  if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+      .then(function(registration) {
+      // Registration was successful
+      console.log('ServiceWorker registration successful with scope: ',
+      registration.scope);
+      })
+      .catch(function(err) {
+          // registration failed
+          console.log('ServiceWorker registration failed: ', err);
+      });
+    } 
+*/
+  	
+  	
+//Register the service worker with Background Sync
+if ('serviceWorker' in navigator && 'SyncManager' in window) { 
+	navigator.serviceWorker.register('./sw.js')
+	.then(registration => navigator.serviceWorker.ready) // geht nur mit Chrome!
+	//.then(registration => {
+	.then(function(registration){
+		// Registration was successful
+  		console.log('ServiceWorker registration successful with scope: ',registration.scope);
 
-        // Filter: nur geschlossene Tasks anzeigen
-        $("#listClosed").click(function(){
-            $.ajax({
-                type: 'GET',
-                url: 'listClosedTasks'
-            })
-            .done(listItems)   
-    	});
+  		// Block wird unabhängig ob offline ausgeführt !
+		document.getElementById('submit').addEventListener('click', () => {  
+			registration.sync.register('task').then(() => { 
+				console.log('synk');
+				var payload = { 
+					pendenz: document.getElementById('pendenz').value, 
+				};
+				idbKeyval.set('create', payload);
+				displayMessageNotification('Message queued'); 
+			}); 
+		}); 
+	}); 
+} else {
 
-        // Filter: nur offene Tasks anzeigen
-    	$("#listOpen").click(function(){
-            $.ajax({
-                type: 'GET',
-                url: 'listOpenTasks',
-            })
-            .done(listItems)   
-        });
+    // Fallback
+	document.getElementById('submit').addEventListener('click', () => {
+		console.log('gugus2');
+		var payload = {
+			pendenz: document.getElementById('pendenz').value
+		};
+		fetch('/create/',
+		{
+			method: 'POST',
+			headers: new Headers({'content-type': 'text/html'}),
+			body: payload
+		})
+		.then(displayMessageNotification('Message sent')) 
+		.catch((err) => displayMessageNotification('Message failed'));
 	});
-</script>
+}
+
+</script> 
+
 
 </body>
 </html>

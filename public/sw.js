@@ -1,8 +1,12 @@
 'use strict';
 
-var cacheName = 'toDoo';
-//const cacheName = ‘offline-cache’;
-const offlineUrl = 'offline-page.html';
+// #####################################################################
+// #                                                                   #
+// #  Caching Mechanismus - Eigene Dateien Cachen                      #
+// #                                                                   #
+// #####################################################################
+
+const cacheName = 'toDoo';
 
 // Cache our known resources during install 
 self.addEventListener('install', event => {
@@ -17,75 +21,107 @@ self.addEventListener('install', event => {
   ); 
 });
 
-
-
-
-// SW aktiviert sich selbst, ohne Reload
+// Service Worker aktiviert sich selbst, ohne Reload
 self.addEventListener('activate', event => {
   clients.claim(); 
 });
 
 
+// #####################################################################
+// #                                                                   #
+// #  Network Request Intercepton - Save Data                          #
+// #                                                                   #
+// #####################################################################
+
+// Don't serve google fonts
+this.addEventListener('fetch', function (event) { 
+  if(event.request.headers.get('save-data')){ 
+    // We want to save data, so restrict icons and fonts 
+    if (event.request.url.includes('fonts.googleapis.com')) { 
+      // return nothing 
+      event.respondWith(new Response('', {status: 417, statusText: 'Ignore fonts' })); 
+    } 
+  } 
+});
+
+
+// #####################################################################
+// #                                                                   #
+// #  Offline Strategie - Offline Seite anzeigen                       #
+// #                                                                   #
+// #####################################################################
+
+const offlineUrl = 'offline-page.html';
+
 // Offline-Seite wird aus dem Cache geladen
 this.addEventListener('fetch', event => {
   if(event.request.method ==='GET' && 
     event.request.headers.get('accept').includes('text/html')){ 
-      event.respondWith( 
-        fetch(event.request.url).catch(error => { 
+      event.respondWith(fetch(event.request.url).catch(error => { 
           return caches.match(offlineUrl); 
-        }) 
-      )
-    } 
+      }))
+  } 
   else { 
-    event.respondWith(fetch(event.request)); }
-};
-
-
-/* Beispie aus Buch:
-self.addEventListener('activate', function(event) { 
-  event.waitUntil(self.clients.claim()); });
-*/
-
-// Cache any new resources as they are fetched
-/*self.addEventListener('fetch', event => { 
-  event.respondWith(
-    caches.match(event.request, { ignoreSearch: true }) 
-    .then(function(response) { 
-      if (response) {
-        return response;
-      } 
-
-      var requestToCache = event.request.clone();
-
-      return fetch(requestToCache)
-      .then(function(response) { 
-        if(!response || response.status !== 200) { 
-          return response; 
-        }
-
-        var responseToCache = response.clone(); 
-
-        caches.open(cacheName) 
-        .then(function(cache) {
-          cache.put(requestToCache, responseToCache); 
-        });
-
-        return response; 
-      });
-
-    }) 
-  ); 
-});*/
-
- 
-// Network Request Interception
-/*self.addEventListener('fetch', function(event) { 
-  if (/\.jpg$/.test(event.request.url)) { 
-    event.respondWith( 
-      new Response('<p>This is a response that comes from your service worker!</p>', { 
-        headers: { 'Content-Type': 'text/html' } 
-      });
-    ); 
+    event.respondWith(fetch(event.request)); 
   }
-});*/
+});
 
+// *** Cache first pattern ***
+self.addEventListener('fetch', event => {
+  event.respondWith(caches.match(event.request).then(function (response) { 
+    
+    // Ressource ist im Cache vorhanden -> zurückgeben
+    if (response) { 
+      return response; 
+    } 
+
+    var fetchRequest = event.request.clone();
+
+    // Ressource ist nicht im Cache vorhanden -> an Server weiterleiten
+    return fetch(fetchRequest).then(function (response) { 
+      if (!response || response.status !== 200) { 
+        return response; 
+      }
+
+      // Antwort des Servers kopieren und im Cache speichern
+      var responseToCache = response.clone(); 
+      caches.open(cacheName).then(function (cache) { 
+        cache.put(event.request, responseToCache); 
+      });
+
+      return response;
+
+    // Wenn Ressource nicht angefordert werden kann -> Offline Seite anzeigen
+    }).catch(error => {
+
+      if (event.request.method === 'GET' &&
+       event.request.headers.get('accept').includes('text/html')) {
+        return caches.match(offlineUrl);
+      }
+
+    });
+  }));
+});
+
+
+// #####################################################################
+// #                                                                   #
+// #  Background Sync - idb-keyval DB                                  #
+// #                                                                   #
+// #####################################################################
+
+
+importScripts('./js/idb-keyval.js');
+
+self.addEventListener('sync', (event) => {
+if (event.tag === 'task') { event.waitUntil(
+  idbKeyval.get('create').then(value =>
+    fetch('/create/', {
+      method: 'POST', 
+      headers: new Headers({ 'content-type': 'text/html' }), 
+      body: value
+    })));
+
+    idbKeyval.delete('task');
+  }
+});

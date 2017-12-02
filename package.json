@@ -1,23 +1,23 @@
 {
-  "name": "node-js-getting-started",
-  "version": "0.2.6",
-  "description": "A sample Node.js app using Express 4",
+  "name": "toDoo",
+  "version": "0.1.0",
+  "description": "A Progressive Web App",
   "engines": {
-    "node": "6.11.1"
+    "node": "8.7.0."
   },
-  "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "node test.js"
+    "test": "node test.js",
+    "devstart": "nodemon index.js"
   },
+  "main": "index.js",
   "dependencies": {
     "body-parser": "^1.18.2",
-    "express": "4.15.2"
+    "express": "4.15.2",
+    "express-favicon": "^2.0.0"
   },
   "devDependencies": {
-    "nodemon": "^1.12.1",
-    "request": "^2.81.0",
-    "tape": "^4.7.0"
+    "nodemon": "^1.12.1"
   },
   "repository": {
     "type": "git",
@@ -28,5 +28,5 @@
     "heroku",
     "express"
   ],
-  "license": "MIT"
+  "license": "ISC"
 }

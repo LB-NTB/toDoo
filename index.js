@@ -1,4 +1,5 @@
 const express = require('express')
+const favicon = require('express-favicon');
 const bodyParser = require('body-parser');
 const app = express()
 
@@ -17,6 +18,8 @@ app.get('/', function (req, res) {
 	res.sendFile(path.join(__dirname + '/index.html'));
 });
 */
+
+app.use(favicon(__dirname + '/public/favicon_144.png'));
 
 app.post('/updateItem', function(req,res) {
 	tasks.forEach(function(taskItem){
