@@ -1,10 +1,16 @@
-// Sync Notification
-  	function displayMessageNotification (notificationText){
-		var messageNotification = document.getElementById('message');
-		messageNotification.innerHTML = notificationText;
-		messageNotification.className = 'showMessageNotification';
 
-	}	
+// #####################################################################
+// #                                                                   #
+// #  Sync - Notification                                              #
+// #                                                                   #
+// #####################################################################
+
+function displayMessageNotification (notificationText){
+	var messageNotification = document.getElementById('message');
+	messageNotification.innerHTML = notificationText;
+	messageNotification.className = 'showMessageNotification';
+
+}	
 
 // #####################################################################
 // #                                                                   #
@@ -56,7 +62,7 @@ $(document).ready(function(){
     }
 
     // Liste erstellen
-    function listItems(data, callback){
+    function listItems(data){
         var json = JSON.parse(data);
             $('#list li').remove();         // Liste löschen
             json.forEach(function(item){    // Liste neu aufbauen
@@ -72,13 +78,13 @@ $(document).ready(function(){
 
     // Neuer Task an Server senden und Liste aktualisieren d.h. neu aufbauen
     $("#form").submit(function(event){
-    	var formData = {'pendenz' : $('input[name=pendenz]').val()};
+    	/*var formData = {'pendenz' : $('input[name=pendenz]').val()};
     	$.ajax({
             type: 'POST',
             url:  'create',
             data: formData
         })
-        .done(listItems)
+        .done(listItems)*/
     	event.preventDefault();
     });
     

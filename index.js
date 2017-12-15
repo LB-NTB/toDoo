@@ -4,22 +4,21 @@ const bodyParser = require('body-parser');
 const app = express()
 
 app.use(express.static(__dirname + "/public"));
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-var tasks = [];
+var tasks = [{taskid:1, taks:'default Pendenz', status:'unchecked'}];
 var task  = "";
 var taskimport = "";
 var id = 1;
 
-// Router und Controller
-/*
-app.get('/', function (req, res) {
-	res.sendFile(path.join(__dirname + '/index.html'));
-});
-*/
 
 app.use(favicon(__dirname + '/public/favicon_144.png'));
+
+
+
+
+
 
 app.post('/updateItem', function(req,res) {
 	tasks.forEach(function(taskItem){
@@ -30,8 +29,11 @@ app.post('/updateItem', function(req,res) {
 	res.json(JSON.stringify(tasks));	
 });
 
+
+
 app.post('/create', function(req, res) {
 	taskimport = req.body.pendenz;
+	console.log("Das ist der Import: " + taskimport);
 	task = {
 		taskid: 1 + id,
 		task: 	taskimport,
@@ -39,8 +41,11 @@ app.post('/create', function(req, res) {
 	};
 	id++;
 	tasks.push(task);
-	res.json(JSON.stringify(tasks));
+	//res.json(JSON.stringify(tasks));
+	res.redirect('/');
+
 });
+
 
 app.get('/listTasks', function(req, res) {
 	res.json(JSON.stringify(tasks));

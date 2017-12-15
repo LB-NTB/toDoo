@@ -75,9 +75,13 @@
 
 <!-- Javascript -->
 <script async src="./js/main.js"></script>
+<script async src="./js/idb-keyval.js"></script>
 
 <!-- Service Worker -->
 <script>
+
+
+ 
 
 
 // #####################################################################
@@ -86,48 +90,30 @@
 // #                                                                   #
 // #####################################################################
   	
-  	//Register the service worker without Background Sync
-/*  if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
-      .then(function(registration) {
-      // Registration was successful
-      console.log('ServiceWorker registration successful with scope: ',
-      registration.scope);
-      })
-      .catch(function(err) {
-          // registration failed
-          console.log('ServiceWorker registration failed: ', err);
-      });
-    } 
-*/
-  	
-  	
 //Register the service worker with Background Sync
 if ('serviceWorker' in navigator && 'SyncManager' in window) { 
 	navigator.serviceWorker.register('./sw.js')
 	.then(registration => navigator.serviceWorker.ready) // geht nur mit Chrome!
-	//.then(registration => {
 	.then(function(registration){
 		// Registration was successful
   		console.log('ServiceWorker registration successful with scope: ',registration.scope);
 
-  		// Block wird unabhängig ob offline ausgeführt !
-		document.getElementById('submit').addEventListener('click', () => {  
-			registration.sync.register('task').then(() => { 
-				console.log('synk');
-				var payload = { 
-					pendenz: document.getElementById('pendenz').value, 
-				};
-				idbKeyval.set('create', payload);
-				displayMessageNotification('Message queued'); 
-			}); 
-		}); 
+  		// SYNC
+		document.getElementById('submit').addEventListener('click', () => {
+			// muss ausserhalb von sync sein; sonst undefined
+			var payload = {pendenz: document.getElementById('pendenz').value};	
+			idbKeyval.set('createItem', payload);
+
+			registration.sync.register('task')
+			.then(displayMessageNotification('Message queued'))	
+		}); // ende SYNC
 	}); 
-} else {
+} 
+else {
 
     // Fallback
 	document.getElementById('submit').addEventListener('click', () => {
-		console.log('gugus2');
+		console.log('Fallback');
 		var payload = {
 			pendenz: document.getElementById('pendenz').value
 		};
@@ -135,7 +121,7 @@ if ('serviceWorker' in navigator && 'SyncManager' in window) {
 		{
 			method: 'POST',
 			headers: new Headers({'content-type': 'text/html'}),
-			body: payload
+			body: JSON.stringify(payload)
 		})
 		.then(displayMessageNotification('Message sent')) 
 		.catch((err) => displayMessageNotification('Message failed'));

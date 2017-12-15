@@ -1,4 +1,4 @@
-'use strict';
+//'use strict';
 
 // #####################################################################
 // #                                                                   #
@@ -9,14 +9,14 @@
 const cacheName = 'toDoo';
 
 // Cache our known resources during install 
-self.addEventListener('install', event => {
+/*self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(cacheName)
     .then(cache => cache.addAll([
         //'index.html', 
-        'sw.js',
-        offlineUrl
+        //'sw.js',
+        //offlineUrl
     ])) 
   ); 
 });
@@ -24,7 +24,7 @@ self.addEventListener('install', event => {
 // Service Worker aktiviert sich selbst, ohne Reload
 self.addEventListener('activate', event => {
   clients.claim(); 
-});
+});*/
 
 
 // #####################################################################
@@ -34,7 +34,7 @@ self.addEventListener('activate', event => {
 // #####################################################################
 
 // Don't serve google fonts
-this.addEventListener('fetch', function (event) { 
+/*this.addEventListener('fetch', function (event) { 
   if(event.request.headers.get('save-data')){ 
     // We want to save data, so restrict icons and fonts 
     if (event.request.url.includes('fonts.googleapis.com')) { 
@@ -42,7 +42,7 @@ this.addEventListener('fetch', function (event) {
       event.respondWith(new Response('', {status: 417, statusText: 'Ignore fonts' })); 
     } 
   } 
-});
+});*/
 
 
 // #####################################################################
@@ -54,7 +54,7 @@ this.addEventListener('fetch', function (event) {
 const offlineUrl = 'offline-page.html';
 
 // Offline-Seite wird aus dem Cache geladen
-this.addEventListener('fetch', event => {
+/*this.addEventListener('fetch', event => {
   if(event.request.method ==='GET' && 
     event.request.headers.get('accept').includes('text/html')){ 
       event.respondWith(fetch(event.request.url).catch(error => { 
@@ -101,7 +101,7 @@ self.addEventListener('fetch', event => {
 
     });
   }));
-});
+});*/
 
 
 // #####################################################################
@@ -113,15 +113,26 @@ self.addEventListener('fetch', event => {
 
 importScripts('./js/idb-keyval.js');
 
-self.addEventListener('sync', (event) => {
-if (event.tag === 'task') { event.waitUntil(
-  idbKeyval.get('create').then(value =>
-    fetch('/create/', {
-      method: 'POST', 
-      headers: new Headers({ 'content-type': 'text/html' }), 
-      body: value
-    })));
+self.addEventListener('sync', function(event) {
+	if (event.tag === 'task') { 
+		event.waitUntil(
+	  	idbKeyval.get('createItem').then(value =>
+			   fetch('/create', {
+			     method:  'POST', 
+			     headers: new Headers ({'content-type': 'application/json' }), 
+			     body:    JSON.stringify(value)
+			   })
+        // .then(response => response.json())
+        // .then(response => {
+        //   console.log("Antwort des Servers: " + response); 
+        // })
+        //.then(displayMessageNotification('Message sent')) 
+        //.catch((err) => displayMessageNotification('Message failed'))
+        .then(console.log('Pendenz an Server gesendet'))
+        .then(idbKeyval.delete('createItem'))
+      ) // ende kdbKeyval
+    );  // ende waitUntil
+	}
 
-    idbKeyval.delete('task');
-  }
+  
 });
