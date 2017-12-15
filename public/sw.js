@@ -1,4 +1,4 @@
-//'use strict';
+'use strict';
 
 // #####################################################################
 // #                                                                   #
@@ -9,7 +9,7 @@
 const cacheName = 'toDoo';
 
 // Cache our known resources during install 
-/*self.addEventListener('install', event => {
+self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
     caches.open(cacheName)
@@ -24,7 +24,7 @@ const cacheName = 'toDoo';
 // Service Worker aktiviert sich selbst, ohne Reload
 self.addEventListener('activate', event => {
   clients.claim(); 
-});*/
+});
 
 
 // #####################################################################
@@ -34,7 +34,7 @@ self.addEventListener('activate', event => {
 // #####################################################################
 
 // Don't serve google fonts
-/*this.addEventListener('fetch', function (event) { 
+this.addEventListener('fetch', function (event) { 
   if(event.request.headers.get('save-data')){ 
     // We want to save data, so restrict icons and fonts 
     if (event.request.url.includes('fonts.googleapis.com')) { 
@@ -42,7 +42,7 @@ self.addEventListener('activate', event => {
       event.respondWith(new Response('', {status: 417, statusText: 'Ignore fonts' })); 
     } 
   } 
-});*/
+});
 
 
 // #####################################################################
@@ -54,7 +54,7 @@ self.addEventListener('activate', event => {
 const offlineUrl = 'offline-page.html';
 
 // Offline-Seite wird aus dem Cache geladen
-/*this.addEventListener('fetch', event => {
+this.addEventListener('fetch', event => {
   if(event.request.method ==='GET' && 
     event.request.headers.get('accept').includes('text/html')){ 
       event.respondWith(fetch(event.request.url).catch(error => { 
@@ -101,7 +101,7 @@ self.addEventListener('fetch', event => {
 
     });
   }));
-});*/
+});
 
 
 // #####################################################################
@@ -128,7 +128,7 @@ self.addEventListener('sync', function(event) {
         // })
         //.then(displayMessageNotification('Message sent')) 
         //.catch((err) => displayMessageNotification('Message failed'))
-        .then(console.log('Pendenz an Server gesendet'))
+        .then(console.log('An Server gesendet: ' + value.pendenz))
         .then(idbKeyval.delete('createItem'))
       ) // ende kdbKeyval
     );  // ende waitUntil
