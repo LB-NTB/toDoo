@@ -18,12 +18,11 @@ app.use(favicon(__dirname + '/public/favicon_144.png'));
 
 
 app.get('/', function (req, res) {
-	res.setHeader('Cache-Control', 'no-cache');
-   res.render('index', { 
-   	taskArray:tasks
-   })
-  console.log(tasks);
-  console.log('blabla');
+	//res.setHeader('Cache-Control', 'no-cache');
+	res.render('index', { 
+   		taskArray:tasks
+   	})
+  	console.log(tasks);
 })
 
 
@@ -48,10 +47,6 @@ app.post('/create', function(req, res) {
 	tasks.push(task);
 	id++;
 	res.redirect('/');
-	//res.render('index', { 
-  	//	taskArray:tasks
-  	//})
-
 });
 
 
