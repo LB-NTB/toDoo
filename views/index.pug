@@ -1,0 +1,61 @@
+doctype html
+html
+	head
+		meta(charset="utf-8")
+		meta(name="viewport" content="width=device-width, initial-scale=1")
+		link(rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css")
+		link(rel="stylesheet" type="text/css" href="./css/toDoo.css")
+		// Google fonts
+		link(href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet")
+		// Manifest
+		link(rel="manifest" href="/manifest.json")
+		script(src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+		script(src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js")
+		// DB for Background Sync
+		script(src="./js/idb-keyval.js")
+		title toDoo
+		style.
+	body
+		// Nav-bar
+		nav.navbar.navbar-inverse
+			.container-fluid
+				.navbar-header
+					button.navbar-toggle(type="button" data-toggle="collapse" data-target="#myNavbar")
+						span.icon-bar
+						span.icon-bar
+						span.icon-bar
+					a.navbar-brand(href="#") toDoo
+				#myNavbar.collapse.navbar-collapse
+					ul.nav.navbar-nav
+					.btn-group
+						button#listOpen.btn.btn-primary.navbar-btn(type="button") open
+						button#listClosed.btn.btn-primary.navbar-btn(type="button") closed
+						button#listAll.btn.btn-primary.navbar-btn(type="button") all
+		// Main
+		.container
+			#offline
+			#message
+			h1 ToDo List
+			p Eine einfache Pendenzen-Tracking-App
+			form#form(action="/create" method="POST" name="myForm")
+				.form-group
+					label(for="name") Enter task:
+					input#pendenz.form-control(type="text" name="pendenz" value="Pendenz ")
+				button#submit.btn.btn-default(type="submit") Add
+
+			// Pendenzen-Liste
+			.container-fluid
+				ul#list.list-unstyled
+				each task in taskArray	
+					if task.status == 'checked'
+						li.checkbox
+							input(type="checkbox" id="+task.taskid+" checked)
+							label= task.task
+					else
+						li.checkbox
+							input(type="checkbox" id="+task.taskid+")
+							label= task.task
+
+		// Javascript
+		script(async="" src="./js/main.js")
+		script(async="" src="./js/idb-keyval.js")

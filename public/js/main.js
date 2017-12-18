@@ -1,6 +1,52 @@
 
 // #####################################################################
 // #                                                                   #
+// #  Register Service Worker                                          #
+// #                                                                   #
+// #####################################################################
+    
+//Register the service worker with Background Sync
+if ('serviceWorker' in navigator && 'SyncManager' in window) { 
+    navigator.serviceWorker.register('./sw.js')
+    .then(registration => navigator.serviceWorker.ready) // geht nur mit Chrome!
+    .then(function(registration){
+        // Registration was successful
+        console.log('ServiceWorker registration successful with scope: ',registration.scope);
+
+        // SYNC
+        document.getElementById('submit').addEventListener('click', () => {
+            // muss ausserhalb von sync sein; sonst undefined
+            var payload = {pendenz: document.getElementById('pendenz').value};  
+            idbKeyval.set('createItem', payload);
+
+            registration.sync.register('task')
+            //.then(displayMessageNotification('Message queued')) -> kann nicht mehr ausgeblendet werden...
+        }); // ende SYNC
+    }); 
+} 
+else {
+
+    // Fallback
+    document.getElementById('submit').addEventListener('click', () => {
+        console.log('Fallback');
+        var payload = {
+            pendenz: document.getElementById('pendenz').value
+        };
+        fetch('/create/',
+        {
+            method: 'POST',
+            headers: new Headers({'content-type': 'text/html'}),
+            body: JSON.stringify(payload)
+        })
+        .then(displayMessageNotification('Message sent')) 
+        .catch((err) => displayMessageNotification('Message failed'));
+    });
+}
+
+
+
+// #####################################################################
+// #                                                                   #
 // #  Sync - Notification                                              #
 // #                                                                   #
 // #####################################################################
@@ -39,6 +85,8 @@ window.addEventListener('offline', showIndicator);
 
 
 $(document).ready(function(){
+
+     $("input:checkbox").on('click', checkboxChanged);
 
     // wenn Checkbox geändert wird
     function checkboxChanged() {
