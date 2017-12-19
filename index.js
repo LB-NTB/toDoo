@@ -3,6 +3,8 @@ const favicon = require('express-favicon');
 const bodyParser = require('body-parser');
 const app = express()
 
+
+
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -16,17 +18,38 @@ var id = 2;
 
 app.use(favicon(__dirname + '/public/favicon_144.png'));
 
-
+// home = list all tasks
 app.get('/', function (req, res) {
-	//res.setHeader('Cache-Control', 'no-cache');
 	res.render('index', { 
    		taskArray:tasks
-   	})
-  	console.log(tasks);
+   	})	
 })
 
 
-app.post('/updateItem', function(req,res) {
+// CREATE task
+app.post('/tasks/', function(req,res) {
+	taskimport = req.body.pendenz;
+	console.log("Folgende Pendenz wurde importiert: " + taskimport);
+	task = {
+		taskid: 1 + id,
+		task: 	taskimport,
+		status: 'unchecked'
+	};
+	tasks.push(task);
+	id++;
+	console.log('Die Liste auf dem Server besteht aus: ');
+	console.log(tasks);
+	res.send("hello world");
+	//res.redirect('/');
+	console.log('du dürftest gar nicht angezeigt werden');
+});
+
+
+
+
+
+// UPDATE task
+app.post('/task', function(req,res) {
 	tasks.forEach(function(taskItem){
 		if (taskItem.taskid == req.body.id) {
 			taskItem.status = req.body.status;
@@ -35,36 +58,37 @@ app.post('/updateItem', function(req,res) {
 	res.json(JSON.stringify(tasks));	
 });
 
-
-app.post('/create', function(req, res) {
-	taskimport = req.body.pendenz;
-	console.log("Das ist der Import: " + taskimport);
-	task = {
-		taskid: 1 + id,
-		task: 	taskimport,
-		status: 'unchecked'
-	};
-	tasks.push(task);
-	id++;
-	res.redirect('/');
-});
-
-
-app.get('/listTasks', function(req, res) {
+// list all tasks
+app.get('/tasks', function(req, res) {
 	res.json(JSON.stringify(tasks));
 });
 
-app.get('/listClosedTasks', function(req, res) {
-	var closedTasks = tasks.filter(function(taskItem){
+// list closed/open tasks
+app.get('/tasks/:filter', function(req, res) {
+	if (req.params.filter == 'CLOSED') {
+		var closedTasks = tasks.filter(function(taskItem){
 		if (taskItem.status == 'checked'){
 			return true;
 		}
 		return false;
-	});
-	res.json(JSON.stringify(closedTasks));
+		});
+		res.json(JSON.stringify(closedTasks))
+	}
+	else if (req.params.filter == 'OPEN') {
+		var openTasks = tasks.filter(function(taskItem){
+		if (taskItem.status == 'unchecked'){
+			return true;
+		}
+		return false;
+		}); // end filter
+		res.json(JSON.stringify(openTasks))
+	} // end open
+	else
+		res.redirect('/')
 });
 
-app.get('/listOpenTasks', function(req, res) {
+// list open tasks
+app.get('/tasks?filter=OPEN', function(req, res) {
 	var openTasks = tasks.filter(function(taskItem){
 		if (taskItem.status == 'unchecked'){
 			return true;

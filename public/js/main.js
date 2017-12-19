@@ -17,33 +17,15 @@ if ('serviceWorker' in navigator && 'SyncManager' in window) {
         document.getElementById('submit').addEventListener('click', () => {
             // muss ausserhalb von sync sein; sonst undefined
             var payload = {pendenz: document.getElementById('pendenz').value};  
-            idbKeyval.set('createItem', payload);
+            idbKeyval.set('createItem', payload)
+            .then(() => registration.sync.register('task'))
+            .catch(err => console.log('It failed!', err));
 
-            registration.sync.register('task')
+            
             //.then(displayMessageNotification('Message queued')) -> kann nicht mehr ausgeblendet werden...
         }); // ende SYNC
     }); 
 } 
-else {
-
-    // Fallback
-    document.getElementById('submit').addEventListener('click', () => {
-        console.log('Fallback');
-        var payload = {
-            pendenz: document.getElementById('pendenz').value
-        };
-        fetch('/create/',
-        {
-            method: 'POST',
-            headers: new Headers({'content-type': 'text/html'}),
-            body: JSON.stringify(payload)
-        })
-        .then(displayMessageNotification('Message sent')) 
-        .catch((err) => displayMessageNotification('Message failed'));
-    });
-}
-
-
 
 // #####################################################################
 // #                                                                   #
@@ -51,12 +33,12 @@ else {
 // #                                                                   #
 // #####################################################################
 
-function displayMessageNotification (notificationText){
+/*function displayMessageNotification (notificationText){
 	var messageNotification = document.getElementById('message');
 	messageNotification.innerHTML = notificationText;
 	messageNotification.className = 'showMessageNotification';
 
-}	
+}*/	
 
 // #####################################################################
 // #                                                                   #
@@ -64,7 +46,7 @@ function displayMessageNotification (notificationText){
 // #                                                                   #
 // #####################################################################
 
-var offlineNotification = document.getElementById('offline');
+/*var offlineNotification = document.getElementById('offline');
 
 function showIndicator() { 
 	offlineNotification.innerHTML = 'You are currently offline.'; 
@@ -75,7 +57,7 @@ function hideIndicator() {
 }
 window.addEventListener('online',hideIndicator);
 window.addEventListener('offline', showIndicator);
-
+*/
 
 // #####################################################################
 // #                                                                   #
@@ -86,7 +68,7 @@ window.addEventListener('offline', showIndicator);
 
 $(document).ready(function(){
 
-     $("input:checkbox").on('click', checkboxChanged);
+/*     $("input:checkbox").on('click', checkboxChanged);
 
     // wenn Checkbox geändert wird
     function checkboxChanged() {
@@ -103,7 +85,7 @@ $(document).ready(function(){
         }; 
         $.ajax({
             type: 'POST',
-            url:  'updateItem',
+            url:  'task',
             data: formData  
         })
         .done(listItems)
@@ -122,25 +104,25 @@ $(document).ready(function(){
                 }
             });
             $("input:checkbox").on('click', checkboxChanged); // EventHandler
-    }
+    }*/
 
     // Neuer Task an Server senden und Liste aktualisieren d.h. neu aufbauen
     $("#form").submit(function(event){
-    	/*var formData = {'pendenz' : $('input[name=pendenz]').val()};
+/*    	var formData = {'pendenz' : $('input[name=pendenz]').val()};
     	$.ajax({
             type: 'POST',
-            url:  'create',
+            url:  'tasks',
             data: formData
         })
         .done(listItems)*/
     	event.preventDefault();
     });
     
-    // Filter: alle Task anzeigen ( = Filter löschen)
+/*    // Filter: alle Task anzeigen ( = Filter löschen)
     $("#listAll").click(function(){
         $.ajax({
             type: 'GET',
-            url: 'listTasks'  
+            url: 'tasks'  
         })
         .done(listItems)
 	});
@@ -149,7 +131,7 @@ $(document).ready(function(){
     $("#listClosed").click(function(){
         $.ajax({
             type: 'GET',
-            url: 'listClosedTasks'
+            url: 'tasks?filter=CLOSED'
         })
         .done(listItems)   
 	});
@@ -158,8 +140,8 @@ $(document).ready(function(){
 	$("#listOpen").click(function(){
         $.ajax({
             type: 'GET',
-            url: 'listOpenTasks',
+            url: 'tasks?filter=OPEN',
         })
         .done(listItems)   
-    });
+    });*/
 });
