@@ -21,7 +21,7 @@ self.addEventListener('install', event => {
         '/css/toDoo.css',
         '/js/main.js',
         '/js/idb-keyval.js',
-        '/index.html'
+        //'/index.html'
     ])) 
   ); 
 });
@@ -128,10 +128,6 @@ self.addEventListener('sync', function(event) {
            //headers: new Headers ({'content-type': 'text/plain' }),
 			     body:    JSON.stringify(value)
 			   })
-        // .then(response => response.json())
-        // .then(response => {
-        //   console.log("Antwort des Servers: " + response); 
-        //})
         //.then(displayMessageNotification('Message sent')) -> funktioniert nicht
         .then(console.log('An Server gesendet: ' + value.pendenz))
         .then(idbKeyval.delete('createItem'))

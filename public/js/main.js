@@ -28,7 +28,7 @@ else {
     document.getElementById('submit').addEventListener('click', () => {
         var payload = {pendenz: document.getElementById('pendenz').value}; 
         fetch('/sendMessage/',{
-            method: ‘POST’,
+            method: 'POST',
             headers: new Headers({
             'content-type': 'application/json'
             }),

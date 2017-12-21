@@ -16,15 +16,18 @@ var id = 2;
 
 app.use(favicon(__dirname + '/public/favicon_144.png'));
 
-// home = list all tasks
+// #######################
+//  HOME = list all tasks
+// #######################
 app.get('/', function (req, res) {
 	res.render('index', { 
    		taskArray:tasks
    	})	
 })
 
-
-// CREATE task
+// #######################
+//  CREATE
+// #######################
 app.post('/tasks/', function(req,res) {
 	taskimport = req.body.pendenz;
 	console.log("Folgende Pendenz wurde importiert: " + taskimport);
@@ -40,68 +43,53 @@ app.post('/tasks/', function(req,res) {
 	res.redirect('/');
 });
 
-
-
-
-
-// UPDATE task
+// #######################
+//  UPDATE
+// #######################
 app.post('/task', function(req,res) {
 	tasks.forEach(function(taskItem){
 		if (taskItem.taskid == req.body.id) {
 			taskItem.status = req.body.status;
 		};
 	});
-	//res.json(JSON.stringify(tasks));
 	res.redirect('/');	
 });
 
-// list all tasks
+// #######################
+//  list all
+// #######################
 app.get('/tasks', function(req, res) {
-	//res.json(JSON.stringify(tasks));
 	res.redirect('/');
 });
 
-
-// list closed/open tasks
+// #######################
+//  list open/closed
+// #######################
 app.get('/tasks/:filter', function(req, res) {
 	if (req.params.filter == 'CLOSED') {
 		var closedTasks = tasks.filter(function(taskItem){
-		if (taskItem.status == 'checked'){
-			return true;
-		}
-		return false;
+			if (taskItem.status == 'checked'){
+				return true;
+			}
+			return false;
 		});
-		//res.json(JSON.stringify(closedTasks))
 		res.render('index', { 
    			taskArray:closedTasks
    		})	
 	} // end closed
 	else if (req.params.filter == 'OPEN') {
 		var openTasks = tasks.filter(function(taskItem){
-		if (taskItem.status == 'unchecked'){
-			return true;
-		}
-		return false;
+			if (taskItem.status == 'unchecked'){
+				return true;
+			}
+			return false;
 		}); // end filter
-		//res.json(JSON.stringify(openTasks))
 		res.render('index', { 
    			taskArray:openTasks
    		})	
 	} // end open
 	else
 		res.redirect('/')
-});
-
-// list open tasks
-app.get('/tasks?filter=OPEN', function(req, res) {
-	var openTasks = tasks.filter(function(taskItem){
-		if (taskItem.status == 'unchecked'){
-			return true;
-		}
-		return false;
-	});
-	//res.json(JSON.stringify(openTasks));
-	res.redirect('/');
 });
 
 app.listen(process.env.PORT || 3000, function(){
