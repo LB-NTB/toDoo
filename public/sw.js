@@ -6,7 +6,7 @@
 // #                                                                   #
 // #####################################################################
 
-/*const cacheName = 'toDoo';
+const cacheName = 'toDoo';
 
 // Cache our known resources during install 
 self.addEventListener('install', event => {
@@ -29,7 +29,7 @@ self.addEventListener('install', event => {
 // Service Worker aktiviert sich selbst, ohne Reload
 self.addEventListener('activate', event => {
   clients.claim(); 
-});*/
+});
 
 
 // #####################################################################
@@ -39,7 +39,7 @@ self.addEventListener('activate', event => {
 // #####################################################################
 
 // Don't serve google fonts
-/*this.addEventListener('fetch', function (event) { 
+this.addEventListener('fetch', function (event) { 
   if(event.request.headers.get('save-data')){ 
     // We want to save data, so restrict icons and fonts 
     if (event.request.url.includes('fonts.googleapis.com')) { 
@@ -47,7 +47,7 @@ self.addEventListener('activate', event => {
       event.respondWith(new Response('', {status: 417, statusText: 'Ignore fonts' })); 
     } 
   } 
-});*/
+});
 
 
 // #####################################################################
@@ -56,7 +56,7 @@ self.addEventListener('activate', event => {
 // #                                                                   #
 // #####################################################################
 
-/*const offlineUrl = 'offline-page.html';
+const offlineUrl = 'offline-page.html';
 
 // Offline-Seite wird aus dem Cache geladen
 this.addEventListener('fetch', event => {
@@ -106,7 +106,7 @@ self.addEventListener('fetch', event => {
 
     });
   }));
-});*/
+});
 
 
 // #####################################################################
@@ -128,13 +128,11 @@ self.addEventListener('sync', function(event) {
            //headers: new Headers ({'content-type': 'text/plain' }),
 			     body:    JSON.stringify(value)
 			   })
-
         // .then(response => response.json())
         // .then(response => {
         //   console.log("Antwort des Servers: " + response); 
         //})
-        //.then(displayMessageNotification('Message sent')) 
-        //.catch((err) => displayMessageNotification('Message failed'))
+        //.then(displayMessageNotification('Message sent')) -> funktioniert nicht
         .then(console.log('An Server gesendet: ' + value.pendenz))
         .then(idbKeyval.delete('createItem'))
       ) // ende kdbKeyval

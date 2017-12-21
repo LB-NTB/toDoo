@@ -3,8 +3,6 @@ const favicon = require('express-favicon');
 const bodyParser = require('body-parser');
 const app = express()
 
-
-
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -39,9 +37,7 @@ app.post('/tasks/', function(req,res) {
 	id++;
 	console.log('Die Liste auf dem Server besteht aus: ');
 	console.log(tasks);
-	res.send("hello world");
-	//res.redirect('/');
-	console.log('du dürftest gar nicht angezeigt werden');
+	res.redirect('/');
 });
 
 
@@ -55,13 +51,16 @@ app.post('/task', function(req,res) {
 			taskItem.status = req.body.status;
 		};
 	});
-	res.json(JSON.stringify(tasks));	
+	//res.json(JSON.stringify(tasks));
+	res.redirect('/');	
 });
 
 // list all tasks
 app.get('/tasks', function(req, res) {
-	res.json(JSON.stringify(tasks));
+	//res.json(JSON.stringify(tasks));
+	res.redirect('/');
 });
+
 
 // list closed/open tasks
 app.get('/tasks/:filter', function(req, res) {
@@ -72,8 +71,11 @@ app.get('/tasks/:filter', function(req, res) {
 		}
 		return false;
 		});
-		res.json(JSON.stringify(closedTasks))
-	}
+		//res.json(JSON.stringify(closedTasks))
+		res.render('index', { 
+   			taskArray:closedTasks
+   		})	
+	} // end closed
 	else if (req.params.filter == 'OPEN') {
 		var openTasks = tasks.filter(function(taskItem){
 		if (taskItem.status == 'unchecked'){
@@ -81,7 +83,10 @@ app.get('/tasks/:filter', function(req, res) {
 		}
 		return false;
 		}); // end filter
-		res.json(JSON.stringify(openTasks))
+		//res.json(JSON.stringify(openTasks))
+		res.render('index', { 
+   			taskArray:openTasks
+   		})	
 	} // end open
 	else
 		res.redirect('/')
@@ -95,7 +100,8 @@ app.get('/tasks?filter=OPEN', function(req, res) {
 		}
 		return false;
 	});
-	res.json(JSON.stringify(openTasks));
+	//res.json(JSON.stringify(openTasks));
+	res.redirect('/');
 });
 
 app.listen(process.env.PORT || 3000, function(){

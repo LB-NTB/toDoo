@@ -20,12 +20,22 @@ if ('serviceWorker' in navigator && 'SyncManager' in window) {
             idbKeyval.set('createItem', payload)
             .then(() => registration.sync.register('task'))
             .catch(err => console.log('It failed!', err));
-
-            
             //.then(displayMessageNotification('Message queued')) -> kann nicht mehr ausgeblendet werden...
         }); // ende SYNC
     }); 
 } 
+else {
+    document.getElementById('submit').addEventListener('click', () => {
+        var payload = {pendenz: document.getElementById('pendenz').value}; 
+        fetch('/sendMessage/',{
+            method: ‘POST’,
+            headers: new Headers({
+            'content-type': 'application/json'
+            }),
+            body: JSON.stringify(payload)
+        });
+    });
+}
 
 // #####################################################################
 // #                                                                   #
@@ -33,12 +43,12 @@ if ('serviceWorker' in navigator && 'SyncManager' in window) {
 // #                                                                   #
 // #####################################################################
 
-/*function displayMessageNotification (notificationText){
+function displayMessageNotification (notificationText){
 	var messageNotification = document.getElementById('message');
 	messageNotification.innerHTML = notificationText;
 	messageNotification.className = 'showMessageNotification';
 
-}*/	
+}	
 
 // #####################################################################
 // #                                                                   #
@@ -46,7 +56,7 @@ if ('serviceWorker' in navigator && 'SyncManager' in window) {
 // #                                                                   #
 // #####################################################################
 
-/*var offlineNotification = document.getElementById('offline');
+var offlineNotification = document.getElementById('offline');
 
 function showIndicator() { 
 	offlineNotification.innerHTML = 'You are currently offline.'; 
@@ -57,7 +67,7 @@ function hideIndicator() {
 }
 window.addEventListener('online',hideIndicator);
 window.addEventListener('offline', showIndicator);
-*/
+
 
 // #####################################################################
 // #                                                                   #
@@ -65,10 +75,7 @@ window.addEventListener('offline', showIndicator);
 // #                                                                   #
 // #####################################################################
 
-
 $(document).ready(function(){
-
-/*     $("input:checkbox").on('click', checkboxChanged);
 
     // wenn Checkbox geändert wird
     function checkboxChanged() {
@@ -77,54 +84,47 @@ $(document).ready(function(){
             'id'      : $(this).attr('id'),
             'status' : 'unchecked' 
             }
+            console.log("checked");
         } else {
             var formData = {
             'id'      : $(this).attr('id'),
             'status'  : 'checked'
             }
+            console.log("unchecked");
         }; 
         $.ajax({
             type: 'POST',
             url:  'task',
             data: formData  
         })
-        .done(listItems)
     }
 
-    // Liste erstellen
-    function listItems(data){
-        var json = JSON.parse(data);
-            $('#list li').remove();         // Liste löschen
-            json.forEach(function(item){    // Liste neu aufbauen
-                if ($(item).prop('status') == 'checked') {
-                    $("#list").append('<li><div class="checkbox"><input type="checkbox" id='+item.taskid+' checked><label>'+item.task+'</label></li></div>');
-                }
-                else {
-                    $("#list").append('<li><div class="checkbox"><input type="checkbox" id='+item.taskid+'><label>'+item.task+'</label></li></div>');    
-                }
-            });
-            $("input:checkbox").on('click', checkboxChanged); // EventHandler
-    }*/
+    // eventListener zu allen Checkboxen hinzufügen
+    window.addEventListener("load", function(){
+        var i;
+        elems = document.getElementsByClassName("checkbox");
+        for(i = 0; i < elems.length; i++) {
+        elems[i].addEventListener("click", checkboxChanged )
+        }
+    });
 
     // Neuer Task an Server senden und Liste aktualisieren d.h. neu aufbauen
     $("#form").submit(function(event){
-/*    	var formData = {'pendenz' : $('input[name=pendenz]').val()};
+/*    	var formData = {'pendenz' : $('input[name=pendenz]').val()}; -> wird neu mit ServiceWorker ausgeführt
     	$.ajax({
             type: 'POST',
             url:  'tasks',
             data: formData
-        })
-        .done(listItems)*/
+        })*/
     	event.preventDefault();
     });
     
-/*    // Filter: alle Task anzeigen ( = Filter löschen)
+    // Filter: alle Task anzeigen ( = Filter löschen)
     $("#listAll").click(function(){
         $.ajax({
             type: 'GET',
             url: 'tasks'  
         })
-        .done(listItems)
 	});
 
     // Filter: nur geschlossene Tasks anzeigen
@@ -132,8 +132,7 @@ $(document).ready(function(){
         $.ajax({
             type: 'GET',
             url: 'tasks?filter=CLOSED'
-        })
-        .done(listItems)   
+        })  
 	});
 
     // Filter: nur offene Tasks anzeigen
@@ -142,6 +141,6 @@ $(document).ready(function(){
             type: 'GET',
             url: 'tasks?filter=OPEN',
         })
-        .done(listItems)   
-    });*/
+        //.done(listItems)   
+    });
 });
